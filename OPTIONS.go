@@ -1,44 +1,48 @@
+package main
 
-func Options(args []string) {
-	const validOptions = "abcdefghijklmnopqrstuvwxyz"
-	var optionBits [4]byte
+import (
+	"fmt"
+	"os"
+)
 
-	for _, arg := range args {
-		if len(arg) < 2 || arg[0] != '-' {
-			fmt.Println("Invalid Option")
-			return
-		}
+func main() {
+	// Define the valid options as a string for simplicity
+	validOptions := "abcdefghijklmnopqrstuvwxyz"
 
-		if Contains(arg, "h") {
+	// Initialize the options bitmask as a 32-bit integer
+	var options uint32 = 0
+
+	// Check if no arguments or the -h flag is present
+	if len(os.Args) == 1 {
+		fmt.Println("options: abcdefghijklmnopqrstuvwxyz")
+		return
+	}
+
+	for _, arg := range os.Args[1:] {
+		if arg == "-h" {
 			fmt.Println("options: abcdefghijklmnopqrstuvwxyz")
 			return
 		}
-
-		for _, char := range arg[1:] { // a b c 
-			index := IndexRune(validOptions, char) // a => 0 b => 1 c => 2
-			if index >= 0 {
-				byteIndex := index / 8   // 0 / 8 => 0 | 1 / 8 => 0 | 2 / 8 => 0           // Определяем, к какому байту относится бит
-				bitPosition := index % 8 // 0 % 8 => 0 | 1 % 8 => 1 | 2 % 8 => 2       // Определяем позицию внутри байта
-
-				optionBits[byteIndex] |= 1 << bitPosition // optionBits[0] = 00000001, 00000010, 00000100 => 00000111
-			} else {
-				fmt.Println("Invalid Option")
-				return
+		if len(arg) > 1 && arg[0] == '-' {
+			for i := 1; i < len(arg); i++ {
+				char := arg[i]
+				if char >= 'a' && char <= 'z' {
+					options |= 1 << (char - 'a')
+				} else {
+					fmt.Println("Invalid Option")
+					return
+				}
 			}
+		} else {
+			fmt.Println("Invalid Option")
+			return
 		}
 	}
 
-	for i := len(optionBits) - 1; i >= 0; i-- { // i = 4 - 1
-		for j := 7; j >= 0; j-- { // j = 7
-			if optionBits[i]&(1<<j) != 0 { // optionBits[3] & 00000001 
-				fmt.Print("1")
-			} else {
-				fmt.Print("0")
-			}
-		}
-		if i > 0 {
-			fmt.Print(" ")
-		}
-	}
-	fmt.Println()
+	// Print the options bitmask as groups of bytes
+	fmt.Printf("%08b %08b %08b %08b\n",
+		options>>24&0xFF,
+		options>>16&0xFF,
+		options>>8&0xFF,
+		options&0xFF)
 }
