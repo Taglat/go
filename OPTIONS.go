@@ -46,3 +46,18 @@ func main() {
 		options>>8&0xFF,
 		options&0xFF)
 }
+
+$ go run . | cat -e
+options: abcdefghijklmnopqrstuvwxyz$
+$ go run . -abc -ijk | cat -e
+00000000 00000000 00000111 00000111$
+$ go run . -z | cat -e
+00000010 00000000 00000000 00000000$
+$ go run . -abc -hijk | cat -e
+options: abcdefghijklmnopqrstuvwxyz$
+$ go run . -h | cat -e
+options: abcdefghijklmnopqrstuvwxyz$
+$ go run . -zh | cat -e
+00000010 00000000 00000000 10000000$
+$ go run . -z -h | cat -e
+options: abcdefghijklmnopqrstuvwxyz$
