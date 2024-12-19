@@ -1,0 +1,98 @@
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func printHelp() {
+	fmt.Println(`--insert
+  -i
+         This flag inserts the string into the string passed as argument.
+--order
+  -o
+         This flag will behave like a boolean, if it is called it will order the argument.`)
+}
+
+func sortString(input string) string {
+	runes := []rune(input)
+	for i := 0; i < len(runes)-1; i++ {
+		for j := 0; j < len(runes)-i-1; j++ {
+			if runes[j] > runes[j+1] {
+				runes[j], runes[j+1] = runes[j+1], runes[j]
+			}
+		}
+	}
+	return string(runes)
+}
+
+func main() {
+	args := os.Args[1:]
+	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
+		printHelp()
+		return
+	}
+
+	var insertStr string
+	order := false
+	mainStr := ""
+
+	for _, arg := range args {
+		switch {
+		case len(arg) > 9 && arg[:9] == "--insert=":
+			insertStr = arg[9:]
+		case arg == "-i":
+			fmt.Println("Error: -i requires a value. Use --insert=<value>.")
+			return
+		case arg == "--order" || arg == "-o":
+			order = true
+		default:
+			mainStr = arg
+		}
+	}
+
+	if mainStr == "" {
+		fmt.Println("Error: No string argument provided.")
+		return
+	}
+
+	if insertStr != "" {
+		mainStr += insertStr
+	}
+
+	if order {
+		mainStr = sortString(mainStr)
+	}
+
+	fmt.Println(mainStr)
+}
+
+$ go run . --insert=4321 --order asdad
+1234aadds
+$ go run . --insert=4321 asdad
+asdad4321
+$ go run . asdad
+asdad
+$ go run . --order 43a21
+1234a
+$ go run .
+--insert
+  -i
+         This flag inserts the string into the string passed as argument.
+--order
+  -o
+         This flag will behave like a boolean, if it is called it will order the argument.
+$ go run . -h
+--insert
+  -i
+         This flag inserts the string into the string passed as argument.
+--order
+  -o
+         This flag will behave like a boolean, if it is called it will order the argument.
+$ go run . --help
+--insert
+  -i
+         This flag inserts the string into the string passed as argument.
+--order
+  -o
+         This flag will behave like a boolean, if it is called it will order the argument.
