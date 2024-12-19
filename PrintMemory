@@ -1,0 +1,26 @@
+package piscine
+
+import "fmt"
+
+func PrintMemory(arr [10]byte) {
+    // Printing the hexadecimal values of the bytes
+    for i, b := range arr {
+        // Print the byte in hexadecimal format
+        fmt.Printf("%02x ", b)
+        // Print a new line after every 4 bytes
+        if (i+1)%4 == 0 {
+            fmt.Println()
+        }
+    }
+    fmt.Println()
+
+    // Printing the ASCII values (replacing non-printable characters with '.')
+    for _, b := range arr {
+        if b >= 32 && b <= 126 {
+            fmt.Print(string(b))
+        } else {
+            fmt.Print(".")
+        }
+    }
+    fmt.Println()
+}
