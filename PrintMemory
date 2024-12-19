@@ -24,3 +24,9 @@ func PrintMemory(arr [10]byte) {
     }
     fmt.Println()
 }
+
+$ go run . | cat -e
+68 65 6c 6c$
+6f 10 15 2a$
+00 00$
+hello..*..$
