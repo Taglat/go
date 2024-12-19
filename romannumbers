@@ -1,0 +1,80 @@
+https://github.com/01-edu/public/blob/master/subjects/romannumbers/README.md
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+// Roman numeral mapping
+type RomanNumeral struct {
+	value  int
+	symbol string
+}
+
+var romanNumerals = []RomanNumeral{
+	{1000, "M"},
+	{900, "CM"},
+	{500, "D"},
+	{400, "CD"},
+	{100, "C"},
+	{90, "XC"},
+	{50, "L"},
+	{40, "XL"},
+	{10, "X"},
+	{9, "IX"},
+	{5, "V"},
+	{4, "IV"},
+	{1, "I"},
+}
+
+func toRoman(num int) (string, string) {
+	roman := ""
+	calculation := ""
+
+	for _, rn := range romanNumerals {
+		for num >= rn.value {
+			roman += rn.symbol
+			if calculation != "" {
+				calculation += "+"
+			}
+			if rn.value >= 1000 || num < rn.value+rn.value {
+				calculation += rn.symbol
+			} else {
+				calculation += fmt.Sprintf("(%s-%s)", romanNumerals[rn.value/2].symbol, rn.symbol)
+			}
+			num -= rn.value
+		}
+	}
+
+	return calculation, roman
+}
+
+func stringToInt(input string) (int, bool) {
+	num := 0
+	for _, char := range input {
+		if char < '0' || char > '9' {
+			return 0, false
+		}
+		num = num*10 + int(char-'0')
+	}
+	return num, true
+}
+
+func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("ERROR: cannot convert to roman digit")
+		return
+	}
+
+	input := os.Args[1]
+	num, valid := stringToInt(input)
+	if !valid || num <= 0 || num >= 4000 {
+		fmt.Println("ERROR: cannot convert to roman digit")
+		return
+	}
+
+	calculation, roman := toRoman(num)
+	fmt.Println(calculation)
+	fmt.Println(roman)
+}
