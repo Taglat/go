@@ -1,0 +1,101 @@
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func toInt(s string) (int, bool) {
+	result := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] < '0' || s[i] > '9' {
+			return 0, false
+		}
+		result = result*10 + int(s[i]-'0')
+	}
+	return result, true
+}
+
+func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("Error")
+		return
+	}
+
+	equation := os.Args[1]
+	stack := []int{}
+	start := 0
+
+	for i := 0; i <= len(equation); i++ {
+		if i == len(equation) || equation[i] == ' ' {
+			if start < i {
+				token := equation[start:i]
+				start = i + 1
+
+				switch token {
+				case "+", "-", "*", "/", "%":
+					if len(stack) < 2 {
+						fmt.Println("Error")
+						return
+					}
+
+					b := stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+					a := stack[len(stack)-1]
+					stack = stack[:len(stack)-1]
+
+					var result int
+					switch token {
+					case "+":
+						result = a + b
+					case "-":
+						result = a - b
+					case "*":
+						result = a * b
+					case "/":
+						if b == 0 {
+							fmt.Println("Error")
+							return
+						}
+						result = a / b
+					case "%":
+						if b == 0 {
+							fmt.Println("Error")
+							return
+						}
+						result = a % b
+					}
+					stack = append(stack, result)
+				default:
+					num, ok := toInt(token)
+					if !ok {
+						fmt.Println("Error")
+						return
+					}
+					stack = append(stack, num)
+				}
+			}
+		} else if equation[i] != ' ' && start == i {
+			start = i
+		}
+	}
+
+	if len(stack) != 1 {
+		fmt.Println("Error")
+		return
+	}
+
+	fmt.Println(stack[0])
+}
+
+
+$ go run . "1 2 * 3 * 4 +" | cat -e
+10$
+$ go run . "1 2 3 4 +" | cat -e
+Error$
+$ go run . | cat -e
+Error$
+$ go run . "     1      3 * 2 -" | cat -e
+1
+$ go run . "     1      3 * ksd 2 -" | cat -e
+Error$
